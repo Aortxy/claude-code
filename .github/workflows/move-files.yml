@@ -1,0 +1,38 @@
+name: Move Files to Root
+
+on:
+  workflow_dispatch: # Bisa dijalankan manual dari tab Actions
+
+jobs:
+  move-to-root:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move files and clean up
+        run: |
+          # Pindah ke folder claude-code kedua
+          cd claude-code/claude-code
+          
+          # Pindahkan semua file (termasuk yang hidden) ke root
+          cp -rn . ../../ 
+          
+          # Kembali ke root
+          cd ../../
+          
+          # Hapus folder lama yang sekarang sudah kosong/duplikat
+          rm -rf claude-code
+          
+          echo "Files moved successfully!"
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Refactor: Move source code to root directory"
+          git push
+          
