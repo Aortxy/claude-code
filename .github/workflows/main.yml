@@ -1,0 +1,32 @@
+name: Extract ZIP
+
+on:
+  push:
+    paths:
+      - "*.zip"  # Jalankan hanya jika ada file ZIP yang di-push
+  workflow_dispatch: # Memungkinkan menjalankan workflow secara manual
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Find ZIP files
+        run: |
+          for file in *.zip; do
+            if [ -f "$file" ]; then
+              unzip -o "$file" -d "${file%.zip}"  # Ekstrak ke folder dengan nama yang sama
+              rm "$file"  # Hapus file ZIP setelah ekstrak
+            fi
+          done
+
+      - name: Commit changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add .
+          git commit -m "Extracted ZIP files"
+          git push
